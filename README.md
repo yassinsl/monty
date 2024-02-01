@@ -1,214 +1,121 @@
-# :snake: Monty Interpreter
+# 0x19. C - Stacks, Queues - LIFO, FIFO
+**About:** In this project, we created a simple interpreter for Monty ByteCodes. The interpreter reads a bytecode file and executes the bytecode commands.
+### The Monty language
+Monty 0.98 is a scripting language that is first compiled into Monty byte codes (Just like Python). It relies on a unique stack, with specific instructions to manipulate it. 
 
-Welcome to the Monty Bytecode Interpreter. This interpreter was built in the C language and is compliant with `ISO90`, `ISO99`, & `ISO11`. It reads Monty bytecode files of any extension (preferably `.m` although it doesn't matter), and interprets the opcodes contained.
+### Monty byte code files
+Files containing Monty byte codes usually have the .m extension. Most of the industry uses this standard but it is not required by the specification of the language. There is not more than one instruction per line. There can be any number of spaces before or after the opcode and its argument: [examples](#Examples)
 
-Our interpreter can be run as either a stack (LIFO) or queue (FIFO). Mode can be switched mid-script. The interpreter can handle a variety of Monty opcodes, including printing, mathematical operations, and more - all handled opcodes are listed below.
+## Objectives:
+* To know what LIFO and FIFO mean
+* To know what a stack is, and when to use it
+* To know what a queue is, and when to use it
+* To know the common implementations of stacks and queues
+* To know the most common use cases of stacks and queues
+* To know the proper way to use global variables
 
-## :running: Getting Started
+### Resource:
+* [Difference between Stack and Queue Data Structures](https://www.geeksforgeeks.org/difference-between-stack-and-queue-data-structures/) || 
 
-* [Ubuntu 14.04 LTS](http://releases.ubuntu.com/14.04/) - Operating system reqd.
+## General Requirements
+* Allowed editors: **vi**, **vim**, **emacs**
+* All files is compiled on **Ubuntu 20.04 LTS using gcc**, using the options **-Wall -Werror -Wextra -pedantic -std=gnu89**
+* All files ends with a new line
+* There is **README.md** file at the root of the **alx-low_level_programming**
+* Maximum of one global variable is allowed
+* No more than 5 functions per file
+* The C standard library is allowed
+* The prototypes of all the functions were included in the header file called monty.h
+* All the header files are include guarded
 
-* [GCC 4.8.4](https://gcc.gnu.org/gcc-4.8/) - Compiler used
-
-
-## :warning: Prerequisites
-
-* Must have `git` installed.
-
-* Must have repository cloned.
-
+## Instruction given:
+* To use the following data structures for this project, and to also include them in the header file.
 ```
-$ sudo apt-get install git
+/**
+ * struct stack_s - doubly linked list representation of a stack (or queue)
+ * @n: integer
+ * @prev: points to the previous element of the stack (or queue)
+ * @next: points to the next element of the stack (or queue)
+ *
+ * Description: doubly linked list node structure
+ * for stack, queues, LIFO, FIFO
+ */
+typedef struct stack_s
+{
+        int n;
+        struct stack_s *prev;
+        struct stack_s *next;
+} stack_t;
 ```
-
-
-## :arrow_down: Installing and Using
-
-Clone the repository into a new directory:
-
 ```
-$ git clone https://github.com/BennettDixon/monty.git
-```
-Compile with the following:
-
-```
-gcc -Wall -Werror -Wextra -pedantic *.c -o monty
-```
-
-Run the interpreter on a file:
-
-```
-./monty file.m
-```
-
-
-## :wrench: Monty Opcodes
-
-* **push**
-  * Usage: `push <int>`
-  * Pushes an element to the stack.
-  * The parameter `<int>` must be an integer.
-
-* **pall**
-  * Prints all values in the stack/queue, starting from the top.
-
-* **pint**
-  * Prints the top value of the stack/queue.
-
-* **pop**
-  * Removes the top element of the stack/queue.
-
-* **swap**
-  * Swaps the top two elements of the stack/queue.
-
-* **nop**
-  * Does not do anything.
-
-* **add**
-  * Adds the top two elements of the stack/queue.
-  * The result is stored in the second element from the top and the top element is popped.
-
-* **sub**
-  * Subtracts the top element of the stack/queue from the second element from the top.
-  * The result is stored in the second element from the top and the top element is removed.
-
-* **mul**
-  * Multiplies the top two elements of the stack/queue.
-  * The result is stored in the second element from the top and the top element is removed.
-
-* **div**
-  * Divides the second element from the top of the stack/queue by the top element.
-  * The result is stored in the second element from the top and the top element is removed.
-
-* **mod**
-  * Computes the modulus of the second element from the top of the stack/queue divided by the top element.
-  * The result is stored in the second element from the top and the top element is removed.
-
-* **pchar**
-  * Prints the character value of the top element of the stack/queue.
-  * The integer at the top is treated as an ASCII value.
-
-* **pstr**
-  * Prints the string contained in the stack/queue.
-  * Prints characters element by element until the stack/queue is empty, a value is `0`, or an error occurs.
-
-* **rotl**
-  * Rotates the top element of the stack/queue to the bottom.
-
-* **rotr**
-  * Rotates the bottom element of the stack/queue to the top.
-
-* **stack**
-  * Switches a queue to stack mode.
-
-* **queue**
-  * Switches a stack to queue mode.
-
-:arrow_forward: Opcodes preceeded by a `#` are treated as comments and the corresponding line is ignored.
-
-:arrow_forward: Lines can be empty and can contain any number of spaces before or after an opcode and its argument (only the first opcode and/or argument is taken into account).
-
-
-## :clipboard: Examples
-
-Note, Monty Interpreter runs in the default mode of STACK mode. Meaning it uses a stack. To switch to queue mode, see examples below.
-
-Push values onto the stack and print them all, or the top of the stack/front of queue.
-
-```
-$ cat push_pall_pint.m
-push 1
-push 2
-push 3
-pall
-pint
-$ ./monty push_pall_pint.m
-3
-2
-1
-3
+/**
+ * struct instruction_s - opcode and its function
+ * @opcode: the opcode
+ * @f: function to handle the opcode
+ *
+ * Description: opcode and its function
+ * for stack, queues, LIFO, FIFO
+ */
+typedef struct instruction_s
+{
+        char *opcode;
+        void (*f)(stack_t **stack, unsigned int line_number);
+} instruction_t;
 ```
 
-Using mathmatical operations to add, multiply, divide, etc. Takes the second from the top and performs the operation on the top: `second_from_top / top`, `second_from_top - top`, `etc`. Then assigns that to the `second_from_top` and pops the top element off the stack.
+## List of files/Descriptions:
+| S/N   |   Files      		|      Description     |
+|:-----:|--------------------:|--------------------|
+|  1.   |                      |              |
+|  2.   |		|			|
+|  3.   |		|		|
+|  4.   |		|			|
+|  5.   |		|		|
 
+## Compilation & Output
+* These codes were compiled using: ```gcc -Wall -Werror -Wextra -pedantic -std=c89 *.c -o monty```
+* Any output must be printed on ```stdout```
+* Any error message must be printed on ```stderr```
+
+## Examples
 ```
-$ cat math.m
-push 3
-push 2
-push 1
-pall
-mul
-pall
-$ ./monty math.m
-1
-2
-3
-1
-6
+julien@ubuntu:~/monty$ cat -e bytecodes/000.m
+push 0$
+push 1$
+push 2$
+  push 3$
+                   pall    $
+push 4$
+    push 5    $
+      push    6        $
+pall$
+julien@ubuntu:~/monty$
 ```
-
-Entering queue mode to perform all operations in FIFO (queue) mode instead of default LIFO (stack) mode. Note: does not change current stack, sets front of queue to top of stack.
-
+Monty byte code files can contain blank lines (empty or made of spaces only, and any additional text after the opcode or its required argument is not taken into account:
 ```
-$ cat queue.m
-queue
-push 1
-push 2
-push 3
-pall
-stack
-push 4
-push 5
-push 6
-pall
-$ ./monty queue.m
-1
-2
-3
-6
-5
-4
-1
-2
-3
+julien@ubuntu:~/monty$ cat -e bytecodes/001.m
+push 0 Push 0 onto the stack$
+push 1 Push 1 onto the stack$
+$
+push 2$
+  push 3$
+                   pall    $
+$
+$
+                           $
+push 4$
+$
+    push 5    $
+      push    6        $
+$
+pall This is the end of our program. Monty is awesome!$
+julien@ubuntu:~/monty$
 ```
+* Some examples of using monty and its console output.
 
-## :books: Coding Style Tests
+|                        Example #1                      |                    Example #2                   |                      Example #3                           |
+|:-------------------------------------------------------|:------------------------------------------------|:----------------------------------------------------------|
+| ~/monty$ `cat -e bytecodes/00.m` <br> push 1$ <br> push 2$ <br> push 3$ <br> pall$ <br> ~/monty$ `./monty bytecodes/00.m` <br> 3 <br> 2 <br> 1  | ~/monty$ `cat bytecodes/07.m`  <br> push 1 <br> push 2 <br> push 3 <br> pall <br> pop <br> pall <br> pop <br> pall <br> pop <br> pall <br>  ~/monty$ `./monty bytecodes/07.m`  <br> 3 <br> 2 <br> 1 <br> 2 <br> 1 <br> 1 | ~/monty$ `cat bytecodes/09.m` <br> push 1 <br> push 2 <br> push 3 <br> pall <br> swap <br> pall <br> ~/monty$ `./monty bytecodes/09.m` <br> 3 <br> 2 <br> 1 <br> 2 <br> 3 <br> 1 |
 
-Strictly followed `Betty` style guide. To install
-
-```
-$ git clone https://github.com/holbertonschool/Betty.git
-
-$ cd Betty; ./install.sh
-```
-
-
-## :pencil: Version
-
-* 0.1.0
-
-
-
-## :blue_book: Authors
-
-* **YASSINE LAHSSINI** - [@yassinsl](https://github.com/yassinsl)
-* **ILIAS ELMAHI** - [@Ielmahi](https://github.com/Ielmahi)
-
-
-
-## :mag: License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## :mega: Acknowledgments
-
-* Holberton School (providing guidance)
-* Stack Overflow (help on various memory errors (not leaks))
-
-
-<p align="center">
-  <img src="https://theme.zdassets.com/theme_assets/10239256/f69718478ae7ecaaae43d9f8aefd9638c313b55e.jpg"
-       alt="alx logo"
-  >
-</p>
+## Authors/Collaborators
+[Okpara Onyedikachi](https://github.com/Dikachis/monty/) || [Duff Iniobong](https://github.com/Duffigoogle/monty/)
